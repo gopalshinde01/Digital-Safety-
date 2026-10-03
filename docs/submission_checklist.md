@@ -40,4 +40,4 @@ Use this checklist before submitting your entry on Unstop:
 - **Theme:** Digital Safety & Cybersecurity
 - **Short Description:** Paste from `docs/unstop_submission_descriptions.md` (Section 1)
 - **Long Description:** Paste from `docs/unstop_submission_descriptions.md` (Section 2)
-- **GitHub Repository URL:** `__________________________________________`
+- **GitHub Repository URL:** `https://github.com/gopalshinde01/Digital-Safety-`
