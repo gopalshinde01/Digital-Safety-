@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Users, X, Check, Copy, Share2, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { translations } from '../services/i18n';
+import { voiceService } from '../services/voice';
 
 export default function FamilyModeModal({ isOpen, onClose, result, language }) {
   if (!isOpen || !result) return null;
@@ -66,6 +67,17 @@ export default function FamilyModeModal({ isOpen, onClose, result, language }) {
           <p className="text-lg sm:text-xl font-semibold leading-relaxed">
             {familyText}
           </p>
+
+          {/* Voice button inside elder card */}
+          <div className="pt-4 flex justify-center">
+            <button
+              onClick={() => voiceService.speak(familyText, language)}
+              className="px-5 py-2.5 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg transition transform active:scale-95"
+            >
+              <span>🔊</span>
+              <span>{language === 'hi' ? "संदेश बोलकर सुनें" : language === 'mr' ? "मेसेज ऐका (Voice)" : "Listen to Advice Aloud"}</span>
+            </button>
+          </div>
         </div>
 
         {/* Elder Checklist */}

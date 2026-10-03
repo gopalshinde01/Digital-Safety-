@@ -1,13 +1,31 @@
-import React from 'react';
-import { ShieldCheck, ShieldAlert, AlertTriangle, Cpu, Link2, Flag, ExternalLink, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldCheck, ShieldAlert, AlertTriangle, Cpu, Link2, Flag, ExternalLink, Sparkles, Volume2, VolumeX } from 'lucide-react';
 import { translations } from '../services/i18n';
+import { voiceService } from '../services/voice';
 
 export default function RiskVerdictCard({ result, language }) {
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
   if (!result) return null;
 
   const t = translations[language] || translations.en;
   const score = result.risk_score;
   const verdict = result.verdict;
+
+  const handleToggleVoice = () => {
+    if (isSpeaking) {
+      voiceService.stop();
+      setIsSpeaking(false);
+    } else {
+      const speechText = `${verdict === 'Scam' ? 'Security Warning! This message is classified as a scam with a risk score of ' + score : 'Notice: This message appears safe.'} ${result.summary}. Immediate advice: ${result.recommended_actions?.[0] || 'Never share your UPI PIN.'}`;
+      voiceService.speak(
+        speechText,
+        language,
+        () => setIsSpeaking(true),
+        () => setIsSpeaking(false)
+      );
+    }
+  };
 
   // Visual styling based on verdict
   let colorTheme = {
@@ -63,6 +81,20 @@ export default function RiskVerdictCard({ result, language }) {
               <Sparkles className="w-3 h-3 text-cyan-400" />
               {result.ai_provider}
             </span>
+
+            {/* Audio Voice Alert Button */}
+            <button
+              onClick={handleToggleVoice}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition shadow-sm ${
+                isSpeaking
+                  ? 'bg-rose-500/20 border-rose-500 text-rose-300 animate-pulse'
+                  : 'bg-slate-800/90 border-slate-700 text-slate-200 hover:border-cyan-500 hover:text-cyan-300'
+              }`}
+              title="Listen to spoken audio alert"
+            >
+              {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5 text-cyan-400" />}
+              <span>{isSpeaking ? "Stop Audio" : "🔊 Listen to Warning"}</span>
+            </button>
           </div>
 
           <p className="text-base sm:text-lg font-medium text-slate-100 leading-relaxed max-w-2xl">

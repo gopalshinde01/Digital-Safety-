@@ -12,8 +12,10 @@ import HowItWorksMetrics from './components/HowItWorksMetrics';
 import SettingsModal from './components/SettingsModal';
 import Footer from './components/Footer';
 import { analyzeMessage, fetchStats } from './services/api';
+import IncidentReportModal from './components/IncidentReportModal';
+import PhoneMockupView from './components/PhoneMockupView';
 import { translations } from './services/i18n';
-import { Users, Share2, Sparkles, AlertCircle } from 'lucide-react';
+import { Users, Share2, Sparkles, AlertCircle, FileText, Smartphone, LayoutDashboard } from 'lucide-react';
 
 export default function App() {
   const [inputText, setInputText] = useState('');
@@ -24,12 +26,14 @@ export default function App() {
   const [familyMode, setFamilyMode] = useState(false);
   const [region, setRegion] = useState('india');
   const [stats, setStats] = useState(null);
+  const [activeTab, setActiveTab] = useState('forensics'); // 'forensics' or 'phone'
 
   // Modals state
   const [isFamilyModalOpen, setIsFamilyModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isIncidentReportOpen, setIsIncidentReportOpen] = useState(false);
 
   const resultsRef = useRef(null);
   const t = translations[language] || translations.en;
@@ -118,53 +122,109 @@ export default function App() {
           <div ref={resultsRef} className="space-y-8 pt-4 animate-fade-in">
             
             {/* Action Bar over Results */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-800">
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                <span>Threat Verdict & Security Breakdown</span>
-              </h2>
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                {/* View Tabs */}
+                <button
+                  onClick={() => setActiveTab('forensics')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ${
+                    activeTab === 'forensics'
+                      ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  <span>Threat Forensics</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('phone')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ${
+                    activeTab === 'phone'
+                      ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span>📱 Phone Mockup</span>
+                </button>
+              </div>
 
-              <div className="flex items-center gap-2.5">
+              {/* Action Modals Triggers */}
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={() => setIsFamilyModalOpen(true)}
-                  className="px-3.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs font-semibold text-amber-300 flex items-center gap-1.5 transition"
+                  className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs font-semibold text-amber-300 flex items-center gap-1.5 transition"
                 >
-                  <Users className="w-4 h-4" />
-                  <span>Elder / Family View</span>
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Elder View</span>
+                </button>
+                <button
+                  onClick={() => setIsIncidentReportOpen(true)}
+                  className="px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-xs font-semibold text-purple-300 flex items-center gap-1.5 transition"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>📄 Evidence Sheet (PDF)</span>
                 </button>
                 <button
                   onClick={() => setIsShareModalOpen(true)}
-                  className="px-3.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-xs font-semibold text-cyan-300 flex items-center gap-1.5 transition"
+                  className="px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-xs font-semibold text-cyan-300 flex items-center gap-1.5 transition"
                 >
-                  <Share2 className="w-4 h-4" />
-                  <span>Share Report Card</span>
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>Share Report</span>
                 </button>
               </div>
             </div>
 
-            {/* Verdict Gauge Card */}
+            {/* Verdict Gauge Card (Visible in both tabs) */}
             <RiskVerdictCard
               result={analysisResult}
               language={language}
             />
 
-            {/* Red Flag Highlights */}
-            <HighlightedText
-              originalText={analyzedText}
-              redFlags={analysisResult.highlighted_phrases}
-              language={language}
-            />
+            {/* Tab 1: Detailed Forensics View */}
+            {activeTab === 'forensics' && (
+              <div className="space-y-8 animate-fade-in">
+                {/* Red Flag Highlights */}
+                <HighlightedText
+                  originalText={analyzedText}
+                  redFlags={analysisResult.highlighted_phrases}
+                  language={language}
+                />
 
-            {/* Link Forensics Breakdown */}
-            <TechnicalLinkBreakdown
-              links={analysisResult.link_analysis}
-              language={language}
-            />
+                {/* Link Forensics Breakdown */}
+                <TechnicalLinkBreakdown
+                  links={analysisResult.link_analysis}
+                  language={language}
+                />
 
-            {/* Do's & Don'ts Checklist + Emergency Helplines */}
-            <ActionChecklist
-              result={analysisResult}
-              language={language}
-            />
+                {/* Do's & Don'ts Checklist + Emergency Helplines */}
+                <ActionChecklist
+                  result={analysisResult}
+                  language={language}
+                />
+              </div>
+            )}
+
+            {/* Tab 2: Live Smartphone Chat Simulation */}
+            {activeTab === 'phone' && (
+              <div className="rounded-2xl glass-panel p-6 border border-slate-800 animate-fade-in flex flex-col items-center">
+                <div className="text-center mb-4">
+                  <h3 className="text-base font-bold text-white flex items-center justify-center gap-2">
+                    <Smartphone className="w-5 h-5 text-cyan-400" />
+                    Simulated Smartphone Receiver View
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    See how this attack appears on a victim's phone with ScamShield overlay warnings
+                  </p>
+                </div>
+                <PhoneMockupView
+                  originalText={analyzedText}
+                  redFlags={analysisResult.highlighted_phrases}
+                  verdict={analysisResult.verdict}
+                  riskScore={analysisResult.risk_score}
+                />
+              </div>
+            )}
 
           </div>
         )}
@@ -190,6 +250,13 @@ export default function App() {
         result={analysisResult}
         originalText={analyzedText}
         language={language}
+      />
+
+      <IncidentReportModal
+        isOpen={isIncidentReportOpen}
+        onClose={() => setIsIncidentReportOpen(false)}
+        result={analysisResult}
+        originalText={analyzedText}
       />
 
       <HowItWorksMetrics

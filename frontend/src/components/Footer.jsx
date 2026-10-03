@@ -40,8 +40,10 @@ export default function Footer() {
           <p>
             Disclaimer: ScamShield AI provides automated heuristic & ML risk scoring. In case of financial fraud, immediately call 1930.
           </p>
-          <p className="flex items-center gap-1">
-            Developed with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> for India & Global Digital Safety
+          <p className="flex items-center gap-1.5 font-medium text-slate-300">
+            <span>Developed with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline" /> by <strong>Gopal Shinde</strong></span>
+            <span className="text-slate-500">•</span>
+            <span className="text-cyan-400 font-semibold">HackNowa Global Hackathon 2026</span>
           </p>
         </div>
 
